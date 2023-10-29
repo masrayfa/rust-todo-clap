@@ -1,0 +1,18 @@
+[package]
+name = "clap-todo"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+chrono = "0.4.31"
+clap = { version = "4.4.6", features = ["derive"] }
+crossterm = "0.27.0"
+ratatui = "0.23.0"
+serde = "1.0.188"
+serde_json = "1.0.107"
+uuid = { version = "1.4.1", features = ["v4", "serde"]}
+sea-orm = { version = "0.12", features = [ "sqlx-mysql", "runtime-tokio-rustls", "macros" ] }
+dotenvy_macro = "0.15.7"
+tokio = { version = "1.33.0", features = ["full"] }
