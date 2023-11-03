@@ -10,10 +10,10 @@ pub struct PagaweanArgs {
 
 #[derive(Debug, Subcommand)]
 pub enum EntityType {
-    /// Create, update delete, read user
+    /// Create, Update, Delete, Read user
     User(UserCommand),
 
-    // Create, update, delete, read todos
+    // Create, Update, Delete, Read todos
     Todo(TodoCommand),
 }
 
@@ -34,6 +34,7 @@ pub enum UserSubCommand {
     Show,
 }
 
+
 #[derive(Debug, Args)]
 pub struct CreateUser {
     pub name: String,
@@ -41,24 +42,24 @@ pub struct CreateUser {
 }
 #[derive(Debug, Args)]
 pub struct UpdateUser {
-    pub id: i32,
+    pub id: String,
     pub name: Option<String>,
     pub email: Option<String>,
 }
 
 #[derive(Debug, Args)]
 pub struct DeleteEntity {
-    pub id: i32,
+    pub id: String,
 }
 
 #[derive(Debug, Args)]
 pub struct TodoCommand {
     #[clap(subcommand)]
-    command: TodoSubCommand,
+    pub command: TodoSubCommand,
 }
 
 #[derive(Debug, Subcommand)]
-enum TodoSubCommand {
+pub enum TodoSubCommand {
     Create(CreateTodo),
 
     Update(UpdateTodo),
@@ -69,21 +70,21 @@ enum TodoSubCommand {
 }
 
 #[derive(Debug, Args)]
-struct CreateTodo {
+pub struct CreateTodo {
     title: String,
-    action: String,
+    task: String,
     duedate: DateTime<Utc>,
 }
 
 #[derive(Debug, Args)]
-struct UpdateTodo {
-    id: i32,
-    title: Option<String>,
-    action: Option<String>,
-    duedate: Option<DateTime<Utc>>,
+pub struct UpdateTodo {
+    pub id: String,
+    pub title: Option<String>,
+    pub task: Option<String>,
+    pub duedate: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Args)]
-struct DeleteTodo {
-    id: i32,
+pub struct DeleteTodo {
+    pub id: String,
 }
