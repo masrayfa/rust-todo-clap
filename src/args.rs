@@ -25,30 +25,43 @@ pub struct UserCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum UserSubCommand {
+    // Create a new user
     Create(CreateUser),
 
+    // Update an existing user
     Update(UpdateUser),
 
+    // Delete an existing user
     Delete(DeleteEntity),
 
+    // Show all users
     Show,
 }
 
 
 #[derive(Debug, Args)]
 pub struct CreateUser {
+    // name of the user
     pub name: String,
+
+    // email of the user
     pub email: String,
 }
 #[derive(Debug, Args)]
 pub struct UpdateUser {
+    // id of the user
     pub id: String,
-    pub name: Option<String>,
-    pub email: Option<String>,
+
+    // name of the user
+    pub name: String,
+
+    // email of the user
+    pub email: String,
 }
 
 #[derive(Debug, Args)]
 pub struct DeleteEntity {
+    // id of the user
     pub id: String,
 }
 
@@ -60,31 +73,48 @@ pub struct TodoCommand {
 
 #[derive(Debug, Subcommand)]
 pub enum TodoSubCommand {
+    // Create a new todo
     Create(CreateTodo),
 
+    // Update an existing todo
     Update(UpdateTodo),
 
-    Read,
-
+    // Delete an existing todo
     Delete(DeleteTodo),
+
+    // Show all todos
+    Read,
 }
 
 #[derive(Debug, Args)]
 pub struct CreateTodo {
+    // title of the todo
     title: String,
+
+    // task of the todo
     task: String,
+
+    // due date of the todo
     duedate: DateTime<Utc>,
 }
 
 #[derive(Debug, Args)]
 pub struct UpdateTodo {
+    // id of the todo
     pub id: String,
-    pub title: Option<String>,
-    pub task: Option<String>,
-    pub duedate: Option<DateTime<Utc>>,
+
+    // title of the todo
+    pub title: String,
+
+    // task of the todo
+    pub task: String,
+
+    // due date of the todo
+    pub duedate: DateTime<Utc>,
 }
 
 #[derive(Debug, Args)]
 pub struct DeleteTodo {
+    // id of the todo
     pub id: String,
 }

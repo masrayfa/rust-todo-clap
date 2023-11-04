@@ -520,24 +520,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "clap-todo"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "clap",
- "crossterm",
- "dotenvy_macro",
- "entity",
- "migration",
- "ratatui",
- "sea-orm",
- "serde",
- "serde_json",
- "tokio",
- "uuid",
-]
-
-[[package]]
 name = "clap_builder"
 version = "4.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1423,6 +1405,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.38",
+]
+
+[[package]]
+name = "pagawean"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "clap",
+ "crossterm",
+ "dotenvy_macro",
+ "entity",
+ "migration",
+ "ratatui",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "tokio",
+ "uuid",
 ]
 
 [[package]]
