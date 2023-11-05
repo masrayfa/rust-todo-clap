@@ -1,5 +1,4 @@
 use dotenvy_macro::dotenv;
-use entity::user::Model;
 use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, Set, ActiveValue, ActiveModelTrait, DeleteResult, ModelTrait, DbConn, DbErr};
 use uuid::Uuid;
 
