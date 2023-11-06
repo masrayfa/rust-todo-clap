@@ -1,4 +1,3 @@
-use chrono::{DateTime, Utc};
 use clap::{Args, Parser, Subcommand};
 
 #[derive(Parser, Debug)]
@@ -89,13 +88,15 @@ pub enum TodoSubCommand {
 #[derive(Debug, Args)]
 pub struct CreateTodo {
     // title of the todo
-    title: String,
+    pub title: String,
 
     // task of the todo
-    task: String,
+    pub task: String,
 
     // due date of the todo
-    duedate: DateTime<Utc>,
+    pub duedate: String,
+
+    pub user_id: String,
 }
 
 #[derive(Debug, Args)]
@@ -110,7 +111,9 @@ pub struct UpdateTodo {
     pub task: String,
 
     // due date of the todo
-    pub duedate: DateTime<Utc>,
+    pub duedate: String,
+
+    pub user_id: String
 }
 
 #[derive(Debug, Args)]

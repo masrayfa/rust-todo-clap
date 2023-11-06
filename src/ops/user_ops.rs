@@ -1,10 +1,9 @@
 use dotenvy_macro::dotenv;
-use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, Set, ActiveValue, ActiveModelTrait, DeleteResult, ModelTrait, DbConn, DbErr};
+use sea_orm::{EntityTrait, Set, ActiveModelTrait, DeleteResult, DbConn, DbErr};
 use uuid::Uuid;
 
 use crate::db::{self, establish_connection};
 use crate::args::{CreateUser, UpdateUser, DeleteEntity, UserSubCommand, UserCommand};
-use crate::models::user_models::User;
 
 pub async fn handle_user_command(user: UserCommand) {
     let command = user.command;
@@ -32,10 +31,10 @@ async fn create_user(user: CreateUser) {
     let database_uri = dotenv!("DATABASE_URL");
     let db = db::establish_connection(database_uri).await;
 
-    let ID = Uuid::new_v4();
+    let id = Uuid::new_v4();
 
     let new_user = entity::user::ActiveModel {
-        id: Set(ID.to_string()),
+        id: Set(id.to_string()),
         name: Set(user.name),
         email: Set(user.email),
         ..Default::default()
@@ -47,7 +46,7 @@ async fn create_user(user: CreateUser) {
             println!("User created: {:?}", user);
         },
         Err(err) => {
-            eprint!("Failed to establish a database connection and create user")
+            eprint!("Failed to establish a database connection and create user: {}", err)
         }
     }
 
@@ -59,20 +58,20 @@ async fn update_user(user: UpdateUser) {
     let database_uri = dotenv!("DATABASE_URL");
     let db = db::establish_connection(database_uri).await;
 
-    let ID = Uuid::parse_str(&user.id).unwrap();
+    let id = Uuid::parse_str(&user.id).unwrap();
 
-    type user_model = entity::user::Model;
+    type UserModel = entity::user::Model;
 
     match db {
         Ok(db) => {
-            let find_user: Option<user_model> = entity::user::Entity::find_by_id(ID.clone())
+            let find_user: Option<UserModel> = entity::user::Entity::find_by_id(id.clone())
                 .one(&db)
                 .await
                 .unwrap();
-            let mut user_active_model : entity::user::ActiveModel = find_user.unwrap().into();
+            let user_active_model : entity::user::ActiveModel = find_user.unwrap().into();
 
             let updated_user = entity::user::ActiveModel {
-                id: Set(ID.to_string()),
+                id: Set(id.to_string()),
                 name: Set(user.name),
                 email: Set(user.email),
                 ..user_active_model
@@ -84,7 +83,7 @@ async fn update_user(user: UpdateUser) {
         },
 
         Err(err) => {
-            eprint!("Failed to establish a database connection and update user")
+            eprint!("Failed to establish a database connection and update user: {}", err)
         }
     }
 
@@ -96,11 +95,11 @@ async fn delete_user(user: DeleteEntity) {
     let database_uri = dotenv!("DATABASE_URL");
     let db = establish_connection(database_uri).await;
 
-    let ID = Uuid::parse_str(&user.id).unwrap();
+    let id = Uuid::parse_str(&user.id).unwrap();
 
     match db {
         Ok(db) => {
-            let res: DeleteResult = entity::user::Entity::delete_by_id(ID.clone())
+            let res: DeleteResult = entity::user::Entity::delete_by_id(id.clone())
                 .exec(&db)
                 .await
                 .unwrap();
@@ -108,7 +107,7 @@ async fn delete_user(user: DeleteEntity) {
             println!("User deleted: {:?}", res);
         }
         Err(err) => {
-            eprint!("Failed to establish a database connection and delete user")
+            eprint!("Failed to establish a database connection and delete user: {}", err)
         }  
     }
 }
@@ -129,7 +128,7 @@ async fn show_users() {
               println!("Users: {:?}", users);
          },
          Err(err) => {
-              eprint!("Failed to establish a database connection and show users")
+              eprint!("Failed to establish a database connection and show users: {}", err)
          }
     }
 }

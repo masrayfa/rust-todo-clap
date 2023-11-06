@@ -1,9 +1,7 @@
 mod args;
 mod db;
 mod ops;
-mod models;
-
-use dotenvy_macro::dotenv;
+mod helper;
 
 use args::EntityType;
 use args::PagaweanArgs;
@@ -16,6 +14,6 @@ async fn main() {
 
     match args.entity_type {
         EntityType::User(user) => user_ops::handle_user_command(user).await,
-        EntityType::Todo(todo) => todo_ops::handle_todo_command(todo)
+        EntityType::Todo(todo) => todo_ops::handle_todo_command(todo).await
     }
 }

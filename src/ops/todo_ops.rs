@@ -1,42 +1,150 @@
+use chrono::Utc;
 use dotenvy_macro::dotenv;
-use sea_orm::{EntityTrait, QueryFilter, ColumnTrait, Set, ActiveValue, ActiveModelTrait};
+use sea_orm::{EntityTrait, Set, ActiveModelTrait};
 use uuid::Uuid;
 
 use crate::db;
-use crate::args::{TodoCommand, TodoSubCommand, CreateTodo, UpdateTodo, DeleteEntity, DeleteTodo};
+use crate::args::{TodoCommand, TodoSubCommand, CreateTodo, UpdateTodo, DeleteTodo};
+use crate::helper::parse_date::parse_date;
 
-pub fn handle_todo_command(todo: TodoCommand) {
+pub async fn handle_todo_command(todo: TodoCommand) {
     let command = todo.command;
 
     match command {
         TodoSubCommand::Create(todo) => {
-            create_todo(todo);
+            create_todo(todo).await;
         },
         TodoSubCommand::Update(todo) => {
-            update_todo(todo);
+            update_todo(todo).await;
         }
         TodoSubCommand::Delete(todo) => {
-            delete_todo(todo);
+            delete_todo(todo).await;
         }
         TodoSubCommand::Read => {
-            read_todos();
+            read_todos().await;
         }
     }
 }
 
-fn create_todo(todo: CreateTodo) {
-    todo!()
+// Create a new todo
+async fn create_todo(todo: CreateTodo) {
+    println!("Creating todo: {:?}", todo);
+
+    let database_uri = dotenv!("DATABASE_URL");
+    let db = db::establish_connection(database_uri).await;
+
+    let id = Uuid::new_v4();
+
+    let now = Utc::now();
+
+    let duedate = parse_date(&todo.duedate);
+
+    match db {
+        Ok(db) => {
+            let new_todo = entity::todo::ActiveModel {
+                id: Set(id.to_string()),
+                title: Set(todo.title),
+                task: Set(todo.task),
+                created_at: Set(now.naive_utc()),
+                due_date: Set(duedate),
+                user_id: Set(todo.user_id),
+                ..Default::default()
+            };
+
+            let todo = new_todo.insert(&db).await.unwrap();
+            println!("Todo created: {:?}", todo);
+        },
+        Err(err) => {
+            eprint!("Failed to establish a database connection and create todo: {}", err)
+        }
+    }
 }
 
-fn update_todo(todo: UpdateTodo) {
-    todo!()
+// Update an existing todo
+async fn update_todo(todo: UpdateTodo) {
+    println!("Updating todo: {:?}", todo);
+
+    let database_uri = dotenv!("DATABASE_URL");
+    let db = db::establish_connection(database_uri).await;
+
+    let id = Uuid::parse_str(&todo.id).unwrap();
+
+    type TodoModel = entity::todo::Model;
+
+    let now = Utc::now();
+
+    let duedate = parse_date(&todo.duedate);
+
+    match db {
+        Ok(db) => {
+            let old_todo : Option<TodoModel> = entity::todo::Entity::find_by_id(id.clone())
+                .one(&db)
+                .await
+                .unwrap(); 
+
+            // let mut user_active_model : entity::user::ActiveModel = find_user.unwrap().into();
+            let todo_active_model : entity::todo::ActiveModel = old_todo.unwrap().into();
+
+            let updated_todo = entity::todo::ActiveModel {
+                id: Set(id.to_string()),
+                title: Set(todo.title),
+                task: Set(todo.task),
+                created_at: Set(now.naive_utc()),
+                due_date: Set(duedate),
+                user_id: Set(todo.user_id),
+                ..todo_active_model
+            };
+
+            println!("Todo updated: {:?}", updated_todo);
+        }
+        Err(err) => {
+            eprint!("Failed to establish a database connection and update todo: {}", err)
+        }
+    }
 }
 
-fn delete_todo(todo: DeleteTodo) {
-    todo!()
+async fn delete_todo(todo: DeleteTodo) {
+    println!("Deleting todo: {:?}", todo);
+
+    let database_uri = dotenv!("DATABASE_URL");
+    let db = db::establish_connection(database_uri).await;
+
+    let id = Uuid::parse_str(&todo.id).unwrap();
+
+    match db {
+        Ok(db) => {
+            let deleted_todo = entity::todo::Entity::find_by_id(id.clone())
+                .one(&db)
+                .await
+                .unwrap(); 
+
+            let deleted_todo: entity::todo::Model = deleted_todo.unwrap().into();
+
+            println!("Todo deleted: {:?}", deleted_todo);
+        },
+        Err(err) => {
+            eprint!("Failed to establish a database connection and delete todo: {}", err)
+        }
+    }
 }
 
-fn read_todos() {
-    todo!()
-}
+async fn read_todos() {
+    println!("Reading todos");
 
+    let database_uri = dotenv!("DATABASE_URL");
+    let db = db::establish_connection(database_uri).await;
+
+    match db {
+        Ok(db) => {
+            let todos = entity::todo::Entity::find()
+                .all(&db)
+                .await
+                .unwrap();
+
+            println!("Todos: {:?}", todos);
+        },
+        Err(err) => {
+            eprint!("Failed to establish a database connection and read todos: {}", err)
+        }
+    }
+}
