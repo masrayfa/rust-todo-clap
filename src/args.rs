@@ -83,6 +83,9 @@ pub enum TodoSubCommand {
 
     /// Show all todos
     Read,
+
+    /// Show all todos by user id
+    ReadByUserId(ReadTodoByUserId),
 }
 
 #[derive(Debug, Args)]
@@ -122,4 +125,10 @@ pub struct UpdateTodo {
 pub struct DeleteTodo {
     /// id of the todo
     pub id: String,
+}
+
+#[derive(Debug, Args)]
+pub struct ReadTodoByUserId {
+    /// user id of the todo
+    pub user_id: String,
 }

@@ -1,6 +1,6 @@
 use chrono::Utc;
 use dotenvy_macro::dotenv;
-use sea_orm::{EntityTrait, Set, ActiveModelTrait};
+use sea_orm::{EntityTrait, Set, ActiveModelTrait, Statement, DbBackend};
 use uuid::Uuid;
 
 use crate::db;
@@ -22,6 +22,9 @@ pub async fn handle_todo_command(todo: TodoCommand) {
         }
         TodoSubCommand::Read => {
             read_todos().await;
+        }
+        TodoSubCommand::ReadByUserId(todo) => {
+            read_todos_by_user_id(todo.user_id).await;
         }
     }
 }
@@ -145,6 +148,30 @@ async fn read_todos() {
         },
         Err(err) => {
             eprint!("Failed to establish a database connection and read todos: {}", err)
+        }
+    }
+}
+
+async fn read_todos_by_user_id(user_id: String) {
+    println!("Reading todos by user id: {}", user_id);
+
+    let database_uri = dotenv!("DATABASE_URL");
+    let db = db::establish_connection(database_uri).await;
+
+    match db {
+        Ok(db) => {
+            let todos = entity::todo::Entity::find()
+            .from_raw_sql(Statement::from_sql_and_values(
+                DbBackend::Postgres,
+                 r#"SELECT * FROM public.todo WHERE user_id = $1"#, 
+                 [user_id.into()]))
+                 .all(&db)
+                 .await;
+
+            println!("Todos: {:?}", todos);
+        }
+        Err(err) => {
+            eprint!("Failed to establish a database connection and read todos by user id: {}", err)
         }
     }
 }
